@@ -19,7 +19,7 @@ const require = createRequire(import.meta.url);
 const mmdcCli = join(dirname(require.resolve('@mermaid-js/mermaid-cli')), 'cli.js');
 
 const server = new Server(
-  { name: 'mermaid-render-mcp', version: '1.0.0' },
+  { name: 'mermaid-render-mcp', version: '1.0.1' },
   { capabilities: { tools: {} } }
 );
 
