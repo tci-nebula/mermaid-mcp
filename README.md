@@ -41,12 +41,14 @@ claude mcp add mermaid -- node /path/to/mermaid-mcp/server.js
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `syntax` | string | *(required)* | Mermaid diagram definition |
-| `format` | `png` \| `svg` | `png` | Output format |
+| `format` | `png` \| `svg` \| `pdf` | `png` | Output format |
 | `theme` | `default` \| `dark` \| `neutral` \| `forest` | `default` | Visual theme |
 | `background` | string | `white` | CSS colour or `transparent` |
 | `width` | number | `1200` | Canvas width in px (PNG only) |
+| `pdfFit` | boolean | `true` | Scale the PDF page to fit the diagram (PDF only) |
+| `output_path` | string | — | Write the result to this file path instead of returning base64 |
 
-Returns the rendered image as base64-encoded data, so MCP clients can display it inline.
+Returns the rendered image as base64-encoded data so MCP clients can display it inline — or, with `output_path`, writes the file to disk (handy for PDFs destined for printing or formal document submission).
 
 ### Example
 
@@ -66,7 +68,7 @@ The server shells out to [`@mermaid-js/mermaid-cli`](https://github.com/mermaid-
 
 ## Roadmap
 
-- [ ] PDF export (formal/legal document workflows)
+- [x] PDF export (formal/legal document workflows)
 - [ ] draw.io XML export (editable diagrams)
 - [x] npm package ([`mermaid-render-mcp`](https://www.npmjs.com/package/mermaid-render-mcp))
 - [ ] Remote-hosted server option
