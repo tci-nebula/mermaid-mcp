@@ -1,6 +1,6 @@
 # mermaid-mcp
 
-An [MCP](https://modelcontextprotocol.io/) server that renders [Mermaid](https://mermaid.js.org/) diagrams to PNG or SVG. Give your LLM the ability to turn diagram syntax into actual images.
+An [MCP](https://modelcontextprotocol.io/) server that renders [Mermaid](https://mermaid.js.org/) diagrams to PNG, SVG, or PDF — or converts them to editable [draw.io](https://www.drawio.com/) files. Give your LLM the ability to turn diagram syntax into actual images and documents.
 
 ## Quick start
 
@@ -60,7 +60,9 @@ It generates the Mermaid syntax, calls `render_diagram`, and you get back a PNG.
 
 ## How it works
 
-The server shells out to [`@mermaid-js/mermaid-cli`](https://github.com/mermaid-js/mermaid-cli) (bundled as a dependency), which uses a headless Chromium to render diagrams. First `npm install` downloads Chromium (~150 MB), so it takes a few minutes.
+PNG, SVG, and PDF rendering shells out to [`@mermaid-js/mermaid-cli`](https://github.com/mermaid-js/mermaid-cli) (bundled as a dependency), which uses a headless Chromium to render diagrams. First `npm install` downloads Chromium (~150 MB), so it takes a few minutes.
+
+draw.io export is pure JavaScript — a flowchart parser plus [dagre](https://github.com/dagrejs/dagre) layout (the same engine Mermaid uses) emit native mxGraphModel XML, so every shape stays individually editable in draw.io.
 
 ## Requirements
 
