@@ -4,16 +4,10 @@ An [MCP](https://modelcontextprotocol.io/) server that renders [Mermaid](https:/
 
 ## Quick start
 
-```bash
-git clone https://github.com/tci-nebula/mermaid-mcp.git
-cd mermaid-mcp
-npm install
-```
-
 ### Claude Code
 
 ```bash
-claude mcp add mermaid -- node /path/to/mermaid-mcp/server.js
+claude mcp add mermaid -- npx -y mermaid-render-mcp
 ```
 
 ### Claude Desktop
@@ -24,11 +18,22 @@ Add to `claude_desktop_config.json`:
 {
   "mcpServers": {
     "mermaid": {
-      "command": "node",
-      "args": ["/path/to/mermaid-mcp/server.js"]
+      "command": "npx",
+      "args": ["-y", "mermaid-render-mcp"]
     }
   }
 }
+```
+
+> **Note:** the first run downloads headless Chromium (~150 MB), so the initial startup takes a few minutes.
+
+### From source
+
+```bash
+git clone https://github.com/tci-nebula/mermaid-mcp.git
+cd mermaid-mcp
+npm install
+claude mcp add mermaid -- node /path/to/mermaid-mcp/server.js
 ```
 
 ## Tool: `render_diagram`
@@ -63,7 +68,7 @@ The server shells out to [`@mermaid-js/mermaid-cli`](https://github.com/mermaid-
 
 - [ ] PDF export (formal/legal document workflows)
 - [ ] draw.io XML export (editable diagrams)
-- [ ] npm package (`npx mermaid-mcp`)
+- [x] npm package ([`mermaid-render-mcp`](https://www.npmjs.com/package/mermaid-render-mcp))
 - [ ] Remote-hosted server option
 
 ## License
