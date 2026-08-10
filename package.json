@@ -1,6 +1,6 @@
 {
   "name": "mermaid-render-mcp",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "mcpName": "io.github.tci-nebula/mermaid-render-mcp",
   "description": "MCP server for rendering Mermaid diagrams to PNG or SVG",
   "type": "module",
@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@mermaid-js/mermaid-cli": "^11.4.2",
-    "@modelcontextprotocol/sdk": "^1.17.0"
+    "@modelcontextprotocol/sdk": "^1.17.0",
+    "dagre": "^0.8.5"
   }
 }

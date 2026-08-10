@@ -11,6 +11,7 @@ import { join, dirname } from 'path';
 import { tmpdir } from 'os';
 import { promisify } from 'util';
 import { createRequire } from 'module';
+import { mermaidToDrawio } from './drawio.js';
 
 const execFileAsync = promisify(execFile);
 const require = createRequire(import.meta.url);
@@ -19,7 +20,7 @@ const require = createRequire(import.meta.url);
 const mmdcCli = join(dirname(require.resolve('@mermaid-js/mermaid-cli')), 'cli.js');
 
 const server = new Server(
-  { name: 'mermaid-render-mcp', version: '1.1.0' },
+  { name: 'mermaid-render-mcp', version: '1.2.0' },
   { capabilities: { tools: {} } }
 );
 
@@ -28,8 +29,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
     {
       name: 'render_diagram',
       description:
-        'Render Mermaid diagram syntax into a PNG, SVG, or PDF. ' +
-        'Returns the result as base64-encoded data, or writes it to output_path if given.',
+        'Render Mermaid diagram syntax into a PNG, SVG, or PDF — or convert it to an ' +
+        'editable draw.io (.drawio) file. Returns the result as base64-encoded data ' +
+        '(drawio: XML text), or writes it to output_path if given. ' +
+        'drawio format supports flowcharts only.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -39,9 +42,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
           },
           format: {
             type: 'string',
-            enum: ['png', 'svg', 'pdf'],
+            enum: ['png', 'svg', 'pdf', 'drawio'],
             default: 'png',
-            description: 'Output format. Defaults to png.',
+            description:
+              'Output format. Defaults to png. drawio produces an editable draw.io XML file (flowcharts only).',
           },
           theme: {
             type: 'string',
@@ -102,11 +106,33 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     };
   }
 
-  if (!['png', 'svg', 'pdf'].includes(format)) {
+  if (!['png', 'svg', 'pdf', 'drawio'].includes(format)) {
     return {
-      content: [{ type: 'text', text: `Error: format must be png, svg, or pdf (got "${format}").` }],
+      content: [
+        { type: 'text', text: `Error: format must be png, svg, pdf, or drawio (got "${format}").` },
+      ],
       isError: true,
     };
+  }
+
+  if (format === 'drawio') {
+    try {
+      const xml = mermaidToDrawio(syntax.trim());
+      if (output_path) {
+        await writeFile(output_path, xml, 'utf8');
+        return {
+          content: [
+            { type: 'text', text: `Converted to draw.io XML (${xml.length} chars) written to ${output_path}.` },
+          ],
+        };
+      }
+      return { content: [{ type: 'text', text: xml }] };
+    } catch (err) {
+      return {
+        content: [{ type: 'text', text: `drawio conversion failed: ${err.message}` }],
+        isError: true,
+      };
+    }
   }
 
   const tmpDir = await mkdtemp(join(tmpdir(), 'mermaid-mcp-'));
