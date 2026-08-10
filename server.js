@@ -7,25 +7,19 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { execFile } from 'child_process';
 import { writeFile, readFile, rm, mkdtemp } from 'fs/promises';
-import { join, resolve, dirname } from 'path';
-import { fileURLToPath } from 'url';
+import { join, dirname } from 'path';
 import { tmpdir } from 'os';
 import { promisify } from 'util';
+import { createRequire } from 'module';
 
 const execFileAsync = promisify(execFile);
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const require = createRequire(import.meta.url);
 
-const mmdcCli = resolve(
-  __dirname,
-  'node_modules',
-  '@mermaid-js',
-  'mermaid-cli',
-  'src',
-  'cli.js'
-);
+// cli.js sits next to the package's exported main entry (src/index.js)
+const mmdcCli = join(dirname(require.resolve('@mermaid-js/mermaid-cli')), 'cli.js');
 
 const server = new Server(
-  { name: 'mermaid-mcp', version: '1.0.0' },
+  { name: 'mermaid-render-mcp', version: '1.0.0' },
   { capabilities: { tools: {} } }
 );
 

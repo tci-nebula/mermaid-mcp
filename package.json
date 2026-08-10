@@ -1,14 +1,43 @@
 {
-  "name": "mermaid-mcp",
+  "name": "mermaid-render-mcp",
   "version": "1.0.0",
   "description": "MCP server for rendering Mermaid diagrams to PNG or SVG",
   "type": "module",
   "main": "server.js",
   "bin": {
-    "mermaid-mcp": "server.js"
+    "mermaid-render-mcp": "server.js"
   },
+  "files": [
+    "server.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "node server.js"
+  },
+  "keywords": [
+    "mcp",
+    "modelcontextprotocol",
+    "mermaid",
+    "diagram",
+    "flowchart",
+    "png",
+    "svg",
+    "claude",
+    "llm"
+  ],
+  "author": "Nick Kovac",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tci-nebula/mermaid-mcp.git"
+  },
+  "homepage": "https://github.com/tci-nebula/mermaid-mcp#readme",
+  "bugs": {
+    "url": "https://github.com/tci-nebula/mermaid-mcp/issues"
+  },
+  "engines": {
+    "node": ">=18"
   },
   "dependencies": {
     "@mermaid-js/mermaid-cli": "^11.4.2",
