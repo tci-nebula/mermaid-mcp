@@ -27,6 +27,29 @@ Add to `claude_desktop_config.json`:
 
 > **Note:** the first run downloads headless Chromium (~150 MB), so the initial startup takes a few minutes.
 
+### Docker
+
+No Node.js or Chromium download needed — the image ships with everything (including CJK fonts for Japanese/Chinese/Korean labels):
+
+```bash
+claude mcp add mermaid -- docker run -i --rm tcinebula/mermaid-render-mcp
+```
+
+To use `output_path`, mount a host directory and write into it:
+
+```json
+{
+  "mcpServers": {
+    "mermaid": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "-v", "C:\\diagrams:/out", "tcinebula/mermaid-render-mcp"]
+    }
+  }
+}
+```
+
+Then pass `output_path: "/out/figure.pdf"` and the file appears in `C:\diagrams`.
+
 ### From source
 
 ```bash
