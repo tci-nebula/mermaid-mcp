@@ -154,6 +154,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     if (format === 'pdf' && pdfFit) {
       mmdcArgs.push('--pdfFit');
     }
+    // Set in the Docker image to point Puppeteer at the system Chromium.
+    if (process.env.MERMAID_PUPPETEER_CONFIG) {
+      mmdcArgs.push('-p', process.env.MERMAID_PUPPETEER_CONFIG);
+    }
 
     const { stderr } = await execFileAsync(
       process.execPath,
