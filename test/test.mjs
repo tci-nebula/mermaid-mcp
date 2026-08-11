@@ -95,12 +95,20 @@ ok('lists render_diagram', () =>
 
 const FLOW = 'flowchart LR\n  A[Input] --> B{Valid?}\n  B -->|yes| C[Save]';
 
+// Surface the server's own error text when a render unexpectedly fails.
+function expectSuccess(response) {
+  if (response.result.isError) {
+    throw new Error(`server returned error: ${response.result.content[0]?.text}`);
+  }
+  return response.result;
+}
+
 const png = await request('tools/call', {
   name: 'render_diagram',
   arguments: { syntax: FLOW },
 });
 ok('png renders', () => {
-  const img = png.result.content.find((c) => c.type === 'image');
+  const img = expectSuccess(png).content.find((c) => c.type === 'image');
   assert.equal(img.mimeType, 'image/png');
   assert(Buffer.from(img.data, 'base64').subarray(1, 4).toString() === 'PNG');
 });
@@ -110,7 +118,7 @@ const pdf = await request('tools/call', {
   arguments: { syntax: FLOW, format: 'pdf' },
 });
 ok('pdf renders', () => {
-  const res = pdf.result.content.find((c) => c.type === 'resource');
+  const res = expectSuccess(pdf).content.find((c) => c.type === 'resource');
   assert.equal(res.resource.mimeType, 'application/pdf');
   assert(Buffer.from(res.resource.blob, 'base64').subarray(0, 5).toString() === '%PDF-');
 });

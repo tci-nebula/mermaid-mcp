@@ -15,4 +15,8 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
+      # Ubuntu 23.10+ blocks Chrome's unprivileged sandbox; run without it in CI
+      - run: echo '{"args":["--no-sandbox","--disable-dev-shm-usage"]}' > /tmp/puppeteer-ci.json
       - run: npm test
+        env:
+          MERMAID_PUPPETEER_CONFIG: /tmp/puppeteer-ci.json
