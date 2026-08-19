@@ -162,5 +162,72 @@ const badFormat = await request('tools/call', {
 ok('invalid format errors', () => assert.equal(badFormat.result.isError, true));
 
 server.kill();
+await new Promise((r) => server.once('exit', r));
+
+// ---------- HTTP transport tests ----------
+
+console.log('http transport tests');
+const HTTP_PORT = 39274;
+const httpServer = spawn(process.execPath, [serverPath], {
+  stdio: ['ignore', 'ignore', 'inherit'],
+  env: { ...process.env, PORT: String(HTTP_PORT), AUTH_TOKEN: 'test-secret' },
+});
+// Wait for the port to accept connections.
+for (let i = 0; i < 40; i++) {
+  try {
+    const r = await fetch(`http://127.0.0.1:${HTTP_PORT}/healthz`);
+    if (r.ok) break;
+  } catch {}
+  await new Promise((r) => setTimeout(r, 250));
+}
+
+async function httpCall(payload, token = 'test-secret') {
+  const r = await fetch(`http://127.0.0.1:${HTTP_PORT}/mcp`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json, text/event-stream',
+      Connection: 'close',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify(payload),
+  });
+  return r;
+}
+
+const unauthorized = await httpCall(
+  { jsonrpc: '2.0', id: 1, method: 'tools/list', params: {} },
+  null
+);
+ok('http rejects missing token', () => assert.equal(unauthorized.status, 401));
+
+const httpDio = await httpCall({
+  jsonrpc: '2.0',
+  id: 2,
+  method: 'tools/call',
+  params: { name: 'render_diagram', arguments: { syntax: FLOW, format: 'drawio' } },
+});
+const dioBody = await httpDio.text();
+ok('http renders drawio', () => {
+  assert.equal(httpDio.status, 200);
+  assert(dioBody.includes('mxfile'));
+});
+
+const httpOutPath = await httpCall({
+  jsonrpc: '2.0',
+  id: 3,
+  method: 'tools/call',
+  params: {
+    name: 'render_diagram',
+    arguments: { syntax: FLOW, format: 'drawio', output_path: '/etc/pwned' },
+  },
+});
+const outPathBody = await httpOutPath.text();
+ok('http blocks output_path', () =>
+  assert(outPathBody.includes('not available on the hosted server')));
+
+httpServer.kill();
+await new Promise((r) => httpServer.once('exit', r));
 console.log(process.exitCode ? 'FAILED' : `all ${passed} tests passed`);
-process.exit(process.exitCode ?? 0);
+// No process.exit(): forcing exit races libuv handle teardown on Windows
+// (undici sockets + child stdio) and crashes with a C-level assert.

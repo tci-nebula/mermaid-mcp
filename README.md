@@ -25,7 +25,7 @@ Add to `claude_desktop_config.json`:
 }
 ```
 
-> **Note:** the first run downloads headless Chromium (~150 MB), so the initial startup takes a few minutes.
+> **Note:** the first run downloads headless Chromium (~150 MB), so the initial startup takes a few minutes. If you only need flowcharts and can work with editable files, the [`drawio` fast path](#the-drawio-fast-path-no-chromium) skips Chromium entirely.
 
 ### Docker
 
@@ -80,6 +80,34 @@ Ask your LLM:
 > "Draw me a flowchart of the OAuth login flow"
 
 It generates the Mermaid syntax, calls `render_diagram`, and you get back a PNG.
+
+## The `drawio` fast path (no Chromium)
+
+`format: "drawio"` is the one output that never touches a browser. It's pure JavaScript — parse, lay out with dagre, emit XML — so there's no Chromium download, no ~150 MB install, and no multi-minute first run. Conversion is effectively instant.
+
+Reach for it when:
+
+- you want the diagram **editable** rather than flat — every shape stays a real draw.io object
+- you're on a constrained box (CI, a slim container, a locked-down laptop) where downloading Chromium isn't practical
+- you just want the diagram now and don't need a raster image
+
+```json
+{
+  "syntax": "flowchart TD\n  A[Start] --> B{OK?}\n  B -->|yes| C[Ship]\n  B -->|no| A",
+  "format": "drawio",
+  "output_path": "flow.drawio"
+}
+```
+
+Open the result in [draw.io](https://app.diagrams.net/) (or the VS Code extension) and export to PNG/SVG/PDF from there if you do need an image — that's a complete Chromium-free round trip.
+
+### Limits
+
+- **Flowcharts only.** `flowchart` and `graph` diagrams convert; sequence, class, state, ER, and gantt throw an error. Use PNG/SVG/PDF for those.
+- **`theme`, `background`, and `width` are ignored.** Styling is draw.io's job once the file is open.
+- **Node sizes are estimated** from label length, not measured font metrics. draw.io re-measures text when it opens the file so boxes settle correctly — but treat the raw XML geometry as approximate.
+
+Supported syntax: directions `TD` / `TB` / `BT` / `LR` / `RL`; shapes `[rect]`, `(rounded)`, `{rhombus}`, `((circle))`, `([stadium])`, `[[subroutine]]`, `[(cylinder)]`, `{{hexagon}}`; edges `-->`, `---`, `-.->`, `==>`, `<-->`, each optionally carrying a `|label|`.
 
 ## How it works
 
