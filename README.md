@@ -50,6 +50,14 @@ To use `output_path`, mount a host directory and write into it:
 
 Then pass `output_path: "/out/figure.pdf"` and the file appears in `C:\diagrams`.
 
+### Remote / self-hosted (HTTP)
+
+The same server speaks [Streamable HTTP](https://modelcontextprotocol.io/docs/concepts/transports) when `PORT` is set (or `MCP_TRANSPORT=http`), so it can be deployed to any container host — Railway, Fly.io, etc. — straight from the Dockerfile:
+
+- Endpoint: `POST /mcp` (health check at `/healthz`)
+- Set `AUTH_TOKEN` to require `Authorization: Bearer <token>`
+- `output_path` is disabled in HTTP mode; base64/XML responses only
+
 ### From source
 
 ```bash
@@ -124,7 +132,7 @@ draw.io export is pure JavaScript — a flowchart parser plus [dagre](https://gi
 - [x] PDF export (formal/legal document workflows)
 - [x] draw.io XML export (editable diagrams — flowcharts)
 - [x] npm package ([`mermaid-render-mcp`](https://www.npmjs.com/package/mermaid-render-mcp))
-- [ ] Remote-hosted server option
+- [x] Remote-hosted server option (Streamable HTTP transport)
 
 ## License
 
