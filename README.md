@@ -1,5 +1,7 @@
 # mermaid-mcp
 
+[![test](https://github.com/tci-nebula/mermaid-mcp/actions/workflows/test.yml/badge.svg)](https://github.com/tci-nebula/mermaid-mcp/actions/workflows/test.yml) [![npm](https://img.shields.io/npm/v/mermaid-render-mcp)](https://www.npmjs.com/package/mermaid-render-mcp)
+
 An [MCP](https://modelcontextprotocol.io/) server that renders [Mermaid](https://mermaid.js.org/) diagrams to PNG, SVG, or PDF — or converts them to editable [draw.io](https://www.drawio.com/) files. Give your LLM the ability to turn diagram syntax into actual images and documents.
 
 ## Quick start
